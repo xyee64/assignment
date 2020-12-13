@@ -42,9 +42,9 @@ export class Home extends Component {
                     </Link>
                     <div className="navbar-nav mr-auto">
                         <li className="nav-item">
-                            <Link to ={"/profile"} className="nav-link">
+                            {/* <Link to ={"/profile"} className="nav-link">
                                 Home
-                            </Link>
+                            </Link> */}
                         </li>
 
                         {showAdminBoard &&(
@@ -57,7 +57,7 @@ export class Home extends Component {
 
                         {createEmployee &&(
                             <li className="nav-item">
-                                <Link to= {"/create"} className="nav-link">
+                                <Link to= {"/register"} className="nav-link">
                                     Create
                                 </Link>
                             </li>
