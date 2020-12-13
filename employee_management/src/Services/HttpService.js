@@ -5,11 +5,8 @@ const EMPLOYEE_API_BASE_URL = "http://localhost:8080/employee/";
 
 class HttpService{
     getEmployees(){
-<<<<<<< HEAD
         return axios.get(EMPLOYEE_API_BASE_URL, { headers: authHeader() });
-=======
-        return axios.get(EMPLOYEE_API_BASE_URL );
->>>>>>> f205862df874db5480453c3f987766933b4eafb6
+
     }
 
     createEmployee(employee){
