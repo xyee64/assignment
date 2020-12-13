@@ -31,9 +31,14 @@ OnEdit(id){
     this.props.history.push(`/details/${id}`);
 }
 
+goback = e =>{
+    e.preventDefault();
+    this.props.prevStep();
+}
+
     render(){
         return(
-            <div className="list-form">
+            <div className="list-form container List-con">
                 <h2 className="text-center">Employee List</h2>
                 <div className = "row">
                     <table className="table table-striped table-bordered">
@@ -65,9 +70,12 @@ OnEdit(id){
                                     </td>
                                 </tr>
                               ))
+
+
                             }
                         </tbody>
                     </table>
+                    <button type ="button" className="btn btn-danger" onClick={this.goback}> Back </button>
                 </div>
             </div>
         )

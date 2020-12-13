@@ -37,9 +37,9 @@ export class Home extends Component {
         return (
             <div>
                 <nav className = "navbar navbar-expand navbar-dark bg-dark">
-                    <Link to ={"/"} className="navbar-brand">
+                    {/* <Link to ={"/"} className="navbar-brand"> */}
                         ccc
-                    </Link>
+                    {/* </Link> */}
                     <div className="navbar-nav mr-auto">
                         <li className="nav-item">
                             {/* <Link to ={"/profile"} className="nav-link">
