@@ -33,13 +33,12 @@ export class Home extends Component {
     }
 
     render() {
-        const{currentUser, showAdminBoard,createEmployee,register} = this.state;
+        const{currentUser, showAdminBoard,createEmployee} = this.state;
         return (
             <div>
                 <nav className = "navbar navbar-expand navbar-dark bg-dark">
-                    {/* <Link to ={"/"} className="navbar-brand"> */}
-                        ccc
-                    {/* </Link> */}
+                    <Link to ={"/"} className="navbar-brand">
+                    </Link>
                     <div className="navbar-nav mr-auto">
                         <li className="nav-item">
                             {/* <Link to ={"/profile"} className="nav-link">

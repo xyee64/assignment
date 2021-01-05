@@ -1,5 +1,8 @@
 package com.secure.Security1.model;
 
+import java.time.LocalDateTime;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -18,8 +21,11 @@ public class User {
 	private Integer id;
 	private String username;
 	private String password;
-	
-	
+	private String email;
+	private String resetPasswordToken;
+	@Column(name="expiry_Date",nullable = false)
+	private LocalDateTime expiryDate;
+
 	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinTable(name="users_roles",
 				joinColumns = @JoinColumn(name="user_id"),
@@ -45,12 +51,13 @@ public class User {
 	public User() {
 	}
 
-	public User(String username, String password) {
+	public User(String username, String password, String email) {
+		super();
 		this.username = username;
 		this.password = password;
-		
+		this.email = email;
 	}
-	
+
 	public Integer getId() {
 		return id;
 	}
@@ -74,10 +81,29 @@ public class User {
 	}
 	public void setRoles(Set<Role> roles) {
 		this.roles = roles;
-	}	
+	}
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	public String getResetPasswordToken() {
+		return resetPasswordToken;
+	}
+	public void setResetPasswordToken(String resetPasswordToken) {
+		this.resetPasswordToken = resetPasswordToken;
+	}
 
+	public LocalDateTime getExpiryDate() {
+		return expiryDate;
+	}
+
+	public void setExpiryDate(LocalDateTime expiryDate) {
+		this.expiryDate = expiryDate;
+	}
 
 	
 	
-	
+
 }

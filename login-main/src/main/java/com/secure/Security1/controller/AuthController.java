@@ -7,12 +7,15 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import com.secure.Security1.Employee.Employee;
+import com.secure.Security1.Employee.EmployeeService;
 import com.secure.Security1.model.*;
 import com.secure.Security1.request.*;
 import com.secure.Security1.response.*;
@@ -43,6 +46,7 @@ public class AuthController {
 	@Autowired
 	PasswordEncoder encoder;
 	
+	
 	@PostMapping("/signin")
 	public ResponseEntity<?> createAuthenticationToken (@RequestBody LoginRequest loginRequest) throws Exception{
 		try {
@@ -66,6 +70,7 @@ public class AuthController {
 	}
 	
 	@PostMapping("/register")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
 		if (userRepository.existsByUsername(signUpRequest.getUsername())) {
 			return ResponseEntity
@@ -74,7 +79,8 @@ public class AuthController {
 		}
 
 		User user = new User(signUpRequest.getUsername(), 
-							 encoder.encode(signUpRequest.getPassword()));
+							 encoder.encode(signUpRequest.getPassword()),
+							 signUpRequest.getEmail());
 
 		Set<String> strRoles = signUpRequest.getRole();
 		Set<Role> roles = new HashSet<>();
@@ -108,4 +114,5 @@ public class AuthController {
 
 		return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
 	}
+
 }

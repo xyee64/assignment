@@ -4,9 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.secure.Security1.forgotpass.UserNotFoundException;
 import com.secure.Security1.model.User;
 import com.secure.Security1.respositories.UserRepository;
 
@@ -25,5 +27,4 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
 		return MyUserDetails.build(user);
 	}
-
 }

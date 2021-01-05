@@ -7,13 +7,17 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.secure.Security1.forgotpass.UserNotFoundException;
 import com.secure.Security1.model.Role;
 import com.secure.Security1.model.User;
+import com.secure.Security1.respositories.UserRepository;
 
 public class MyUserDetails implements UserDetails {
 
@@ -22,15 +26,18 @@ public class MyUserDetails implements UserDetails {
 	
 	@JsonIgnore
 	private String password;
+	private String email;
 	private Collection<? extends GrantedAuthority> authorities;
 
-	public MyUserDetails(Integer id, String username, String password,
+	public MyUserDetails(Integer id, String username, String password,String email,
 			Collection<? extends GrantedAuthority> authorities) {
 		this.id = id;
 		this.username = username;
 		this.password = password;
+		this.email = email;
 		this.authorities = authorities;
 	}
+	
 
 	public static MyUserDetails build(User user) {
 		List<GrantedAuthority> authorities = user.getRoles().stream()
@@ -41,6 +48,7 @@ public class MyUserDetails implements UserDetails {
 				user.getId(), 
 				user.getUsername(), 
 				user.getPassword(), 
+				user.getEmail(),
 				authorities);
 	}
 
@@ -62,6 +70,11 @@ public class MyUserDetails implements UserDetails {
 		public String getUsername() {
 			return username;
 		}
+		
+		public String getEmail() {
+			return email;
+		}
+
 
 		@Override
 		public boolean isAccountNonExpired() {
@@ -92,4 +105,6 @@ public class MyUserDetails implements UserDetails {
 			MyUserDetails user = (MyUserDetails) o;
 			return Objects.equals(id, user.id);
 		}
+
+		
 	}

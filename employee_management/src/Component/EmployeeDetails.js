@@ -17,7 +17,8 @@ export class EmployeeDetails extends Component {
             OfficeLocation:"",
             Address:"",
             DOB:"",
-            DateJoined:""
+            DateJoined:"",
+            username:""
         }
     }
 
@@ -29,7 +30,7 @@ export class EmployeeDetails extends Component {
                 name:employee.name,
                 EmployeeId:employee.employeeId,
                 Department:employee.department,
-                Email:employee.eMail,
+                Email:employee.email,
                 Position:employee.position,
                 Superior:employee.superior,
                 PhoneNo:employee.contactNumber,
@@ -37,7 +38,8 @@ export class EmployeeDetails extends Component {
                 OfficeLocation:employee.officeLocation,
                 Address:employee.address,
                 DOB:employee.dob,
-                DateJoined:employee.dateJoined
+                DateJoined:employee.dateJoined,
+                username:employee.userName
             })
         }
         )
@@ -67,6 +69,11 @@ export class EmployeeDetails extends Component {
                                     <label>Employee Id:</label>
                                     <input placeholder="Employee Id" name="name" className="form-control"
                                     value={this.state.EmployeeId} onChange={this.changeEmployeeIdHandler} readOnly></input>
+                                </div>
+                                <div className="form-group">
+                                    <label>Username:</label>
+                                    <input placeholder="Username" name="username" className="form-control"
+                                    value={this.state.username} onChange={this.changeNameHandler} readOnly></input>
                                 </div>
                                 <div className="form-group">
                                     <label>Department:</label>

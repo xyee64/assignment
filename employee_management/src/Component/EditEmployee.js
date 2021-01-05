@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import HttpService from '../Services/HttpService';
-
+import TextField from '@material-ui/core/TextField';
 
 class EditEmployee extends Component{
     constructor(props){
@@ -8,6 +8,7 @@ class EditEmployee extends Component{
         this.state = {
             id:this.props.match.params.id,
             name:"",
+            userName:"",
             EmployeeId:"",
             Department:"",
             Email:"",
@@ -18,7 +19,9 @@ class EditEmployee extends Component{
             OfficeLocation:"",
             Address:"",
             DOB:"",
-            DateJoined:""
+            DateJoined:"",
+            active:"",
+            softDelete:""
         }
         this.changeNameHandler = this.changeNameHandler.bind(this);
         this.changeEmployeeIdHandler = this.changeEmployeeIdHandler.bind(this);
@@ -32,18 +35,19 @@ class EditEmployee extends Component{
         this.changeAddressHandler = this.changeAddressHandler.bind(this);
         this.changeDOBHandler = this.changeDOBHandler.bind(this);
         this.changeDateJoinedHandler = this.changeDateJoinedHandler.bind(this);
+        this.changeUsernameHandler = this.changeUsernameHandler.bind(this);
         this.saveEmployee = this.saveEmployee.bind(this);
     }
 
     componentDidMount(){
-        console.log(this.state.id)
+        this.dateLock()
         HttpService.getEmployeeById(this.state.id).then((res)=>{
             let employee=res.data;
             this.setState({
                 name:employee.name,
                 EmployeeId:employee.employeeId,
                 Department:employee.department,
-                Email:employee.eMail,
+                Email:employee.email,
                 Position:employee.position,
                 Superior:employee.superior,
                 PhoneNo:employee.contactNumber,
@@ -51,7 +55,10 @@ class EditEmployee extends Component{
                 OfficeLocation:employee.officeLocation,
                 Address:employee.address,
                 DOB:employee.dob,
-                DateJoined:employee.dateJoined
+                DateJoined:employee.dateJoined,
+                userName:employee.userName,
+                active:employee.active,
+                softDelete:employee.softDelete
             })
         }
         )
@@ -93,10 +100,29 @@ class EditEmployee extends Component{
     changeDateJoinedHandler =(event)=>{
         this.setState({DateJoined: event.target.value});
     }
+    changeUsernameHandler =(event)=>{
+        this.setState({userName: event.target.value});
+    }
+
+    dateLock =()=>{
+        var today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth()+1; //January is 0!
+        var yyyy = today.getFullYear();
+        if(dd<10){
+                dd='0'+dd
+            } 
+            if(mm<10){
+                mm='0'+mm
+            } 
+
+        today = yyyy+'-'+mm+'-'+dd;
+        document.getElementById("datefield").setAttribute("max", today);
+    }
 
     goBack = (e) =>{
         e.preventDefault();
-        this.props.history.push('/home');
+        this.props.history.push('/admin');
     }
 
     saveEmployee = (e) =>{
@@ -106,7 +132,7 @@ class EditEmployee extends Component{
             name:this.state.name, 
             employeeId:this.state.EmployeeId,
             department:this.state.Department,
-            eMail:this.state.Email,
+            email:this.state.Email,
             position:this.state.Position,
             superior:this.state.Superior,
             contactNumber:this.state.PhoneNo,
@@ -114,9 +140,13 @@ class EditEmployee extends Component{
             officeLocation:this.state.OfficeLocation,
             address:this.state.Address,
             dob:this.state.DOB,
-            dateJoined:this.state.DateJoined};
+            dateJoined:this.state.DateJoined,
+            userName:this.state.userName,
+            active:this.state.active,
+            softDelete:this.state.softDelete};
+
         HttpService.createEmployee(employee).then(res =>{
-            this.props.history.push('/');
+            this.props.history.push('/admin');
         })
     }
 
@@ -127,7 +157,7 @@ class EditEmployee extends Component{
             <div className="container">
                 <div className="row">
                     <div className="card col-md-6 offset-md-3 offset-md-3">
-                        <h3 className="text-center">Add Employee</h3>
+                        <h3 className="text-center">Edit Employee</h3>
                         <div className="card-body">
                             <form>
                                 <div className="form-group">
@@ -181,14 +211,14 @@ class EditEmployee extends Component{
                                     value={this.state.Address} onChange={this.changeAddressHandler}></textarea>
                                 </div>
                                 <div className="form-group">
-                                    <label>Date of Birth:</label>
-                                    <input placeholder="DD/MM/YYYY" name="phone" className="form-control"
-                                    value={this.state.DOB} onChange={this.changeDOBHandler}></input>
+                                    <label>Date of Birth: </label>
+                                    <TextField id="datefield"  type="date" value={this.state.DOB} onChange={this.changeDOBHandler} InputLabelProps={{shrink: true,}}/>
                                 </div>
+
+
                                 <div className="form-group">
-                                    <label>Date Joined:</label>
-                                    <input placeholder="DD/MM/YYYY" name="phone" className="form-control"
-                                    value={this.state.DateJoined} onChange={this.changeDateJoinedHandler}></input>
+                                    <label>Date Joined: </label>
+                                    <TextField id="datefield"  type="date" value={this.state.DateJoined} onChange={this.changeDateJoinedHandler} InputLabelProps={{shrink: true,}}/>
                                 </div>
                                 <button className="btn float-left" onClick={this.goBack}>Cancel</button>
                                 <button className="btn float-right btn-info" onClick={this.saveEmployee}>Save</button>

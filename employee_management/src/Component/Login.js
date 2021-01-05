@@ -53,7 +53,11 @@ export class Login extends Component {
         if (this.checkBtn.context._errors.length === 0) {
           AuthService.login(this.state.username, this.state.password).then(
             () => {
-              this.props.history.push("/home");
+              if(JSON.parse(localStorage.getItem('user')).roles[0]==="ADMIN"){
+                
+                this.props.history.push("/admin");
+              }
+              else{this.props.history.push("/profile");}
               window.location.reload();
             },
             error => {
@@ -143,6 +147,8 @@ export class Login extends Component {
                   }}
                 />
               </Form>
+
+              <a className="forgot-pass" href="/forgot_password">Forgot Password?</a>
             </div>
           </div>
         );

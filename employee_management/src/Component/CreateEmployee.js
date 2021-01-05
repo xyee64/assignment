@@ -1,12 +1,16 @@
 import React, { Component } from 'react';
 import HttpService from '../Services/HttpService';
-import HomePage from './Home';
-
+import AuthService from '../Services/auth.service';
+import TextField from '@material-ui/core/TextField';
+import "react-datepicker/dist/react-datepicker.css";
 class CreateEmployee extends Component{
+    
     constructor(props){
         super(props)
         this.state = {
             name:"",
+            username:"",
+            password:"",
             EmployeeId:"",
             Department:"",
             Email:"",
@@ -17,7 +21,14 @@ class CreateEmployee extends Component{
             OfficeLocation:"",
             Address:"",
             DOB:"",
-            DateJoined:""
+            DateJoined:"",
+            usernameError:"",
+            passwordError:"",
+            nameError:"",
+            emailError:"",
+            experienceError:"",
+            employeeError:"",
+            problems:""
         }
         this.changeNameHandler = this.changeNameHandler.bind(this);
         this.changeEmployeeIdHandler = this.changeEmployeeIdHandler.bind(this);
@@ -31,7 +42,30 @@ class CreateEmployee extends Component{
         this.changeAddressHandler = this.changeAddressHandler.bind(this);
         this.changeDOBHandler = this.changeDOBHandler.bind(this);
         this.changeDateJoinedHandler = this.changeDateJoinedHandler.bind(this);
+        this.changePasswordHandler = this.changePasswordHandler.bind(this);
+        this.changeUsernameHandler = this.changeUsernameHandler.bind(this);
         this.saveEmployee = this.saveEmployee.bind(this);
+        this.checker= this.checker.bind(this);
+        this.emailValidation= this.emailValidation.bind(this);
+    }
+    componentDidMount(){
+        this.dateLock()
+    }
+
+    dateLock =()=>{
+                var today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth()+1; //January is 0!
+        var yyyy = today.getFullYear();
+        if(dd<10){
+                dd='0'+dd
+            } 
+            if(mm<10){
+                mm='0'+mm
+            } 
+
+        today = yyyy+'-'+mm+'-'+dd;
+        document.getElementById("datefield").setAttribute("max", today);
     }
 
     changeNameHandler =(event)=>{
@@ -44,7 +78,7 @@ class CreateEmployee extends Component{
         this.setState({Department: event.target.value});
     }
     changeEmailHandler =(event)=>{
-        this.setState({Email: event.target.value});
+        this.setState({Email: event.target.value.toLowerCase()});
     }
     changePositionHandler =(event)=>{
         this.setState({Position: event.target.value});
@@ -66,19 +100,132 @@ class CreateEmployee extends Component{
     }
     changeDOBHandler =(event)=>{
         this.setState({DOB: event.target.value});
+        console.log(this.state.DOB);
     }
     changeDateJoinedHandler =(event)=>{
         this.setState({DateJoined: event.target.value});
     }
+    changePasswordHandler =(event)=>{
+        this.setState({password: event.target.value});
+    }
+    changeUsernameHandler =(event)=>{
+        this.setState({username: event.target.value.toLowerCase()});
+    }
 
-    saveEmployee = (e) =>{
+    emailchecker(checklist){
+
+        if(this.emailValidation(this.state.Email)===false){
+            window.scrollTo(0,0);
+            this.setState({emailError:"Please enter a valid email address",
+                           problems:1 })
+        }else
+
+        if(this.emailValidation(this.state.Email)){
+            HttpService.CheckMail(checklist).then(res =>{
+                if(res.data==="Email Taken"){
+                    this.setState({emailError:res.data,
+                        problems:1 })
+                }
+            })
+        }
+    }
+    usernamechecker(checklist){
+        if(this.state.username===""){
+            window.scrollTo(0,0);
+            this.setState({usernameError:"Please enter a user name",
+            problems:1 })
+        }else
+        if(this.state.username!==""){
+            HttpService.CheckUsername(checklist).then(res =>{
+                if(res.data==="Username Taken"){
+                    this.setState({usernameError:res.data,
+                        problems:1 })
+                }
+            })
+        }
+    }
+
+    namechecker(){
+        if(this.state.name===""){
+            window.scrollTo(0,0);
+            this.setState({nameError:"Please enter a name",
+            problems:1 })
+        }
+    }
+
+    employeeidchecker(checklist){
+        if(this.state.EmployeeId===""){
+            window.scrollTo(0,0);
+            this.setState({employeeError:"Please enter an Employee ID",
+            problems:1 })
+        }else      
+        if(this.state.EmployeeId!==""){
+            console.log("check")
+            HttpService.CheckId(checklist).then(res =>{
+                if(res.data==="ID already exist in the database"){
+                    this.setState({employeeError:res.data,
+                        problems:1 })
+                }
+            })
+        }
+    }
+
+    passwordcheck(){
+        if (this.state.password===""){
+            window.scrollTo(0,0);
+            this.setState({passwordError:"Please enter a valid password",
+            problems:1 })
+        }
+    }
+
+    experiencecheck(){
+        if (isNaN(this.state.ExperienceYear)) {
+            this.setState({experienceError:"Please enter a number",
+            problems:1 })
+        }
+    }
+
+    problemcheck(){
+        if(this.state.problems===0){
+            this.saveEmployee();
+       }
+    }
+    checker=(e)=>{
+        let checklist={
+            userName:this.state.username,
+            email:this.state.Email,
+            employeeId:this.state.EmployeeId
+        }
         e.preventDefault();
+        this.setState({usernameError:"",
+        nameError:"",
+        passwordError:"",
+        emailError:"",
+        experienceError:"",
+        problems:0})
+
+        this.emailchecker(checklist);
+        this.usernamechecker(checklist);
+        this.namechecker();
+        this.employeeidchecker(checklist);
+        this.passwordcheck();
+        this.experiencecheck();
+        this.problemcheck();
+    }
+
+    emailValidation(email){
+        const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        return re.test(email);
+        };
+
+    saveEmployee = () =>{
+        console.log(this.state.name);
         let employee = {
-            id:this.state.id,
             name:this.state.name, 
+            userName:this.state.username,
             employeeId:this.state.EmployeeId,
             department:this.state.Department,
-            eMail:this.state.Email,
+            email:this.state.Email,
             position:this.state.Position,
             superior:this.state.Superior,
             contactNumber:this.state.PhoneNo,
@@ -86,86 +233,145 @@ class CreateEmployee extends Component{
             officeLocation:this.state.OfficeLocation,
             address:this.state.Address,
             dob:this.state.DOB,
-            dateJoined:this.state.DateJoined};
-        HttpService.createEmployee(employee).then(res =>{
-            this.props.history.push('/admin');
-        })
-    }
+            dateJoined:this.state.DateJoined,
+            active:1};
+        let details = {
+            username:this.state.username,
+            password:this.state.password,
+            email:this.state.Email
+        };
+        HttpService.createEmployeeTest(employee).then(
 
+            AuthService.register(details).then(
+                this.props.history.push('/admin')
+            )
+        )
+    }
+    goBack = (e) =>{
+        e.preventDefault();
+        this.props.history.push('/admin');
+    }
     render(){
         return(
             <div>
                 <div className="details-form">
-                    <div className="row">
+                    
                         <div className="card col-md-6 offset-md-3 offset-md-3">
                             <h3 className="text-center">Add Employee</h3>
                             <div className="card-body">
                                 <form>
                                     <div className="form-group">
                                         <label>Name:</label>
-                                        <input placeholder="Name" name="name" className="form-control"
-                                        value={this.state.name} onChange={this.changeNameHandler}></input>
-                                    </div>
-                                    <div className="form-group">
-                                        <label>Employee Id:</label>
-                                        <input placeholder="Employee Id" name="name" className="form-control"
-                                        value={this.state.EmployeeId} onChange={this.changeEmployeeIdHandler}></input>
-                                    </div>
-                                    <div className="form-group">
-                                        <label>Department:</label>
-                                        <input placeholder="Department" name="department" className="form-control"
-                                        value={this.state.Department} onChange={this.changeDepartmentHandler}></input>
-                                    </div>
-                                    <div className="form-group">
-                                        <label>Email:</label>
-                                        <input placeholder="Email" name="email" className="form-control"
-                                        value={this.state.Email} onChange={this.changeEmailHandler}></input>
-                                    </div>
-                                    <div className="form-group">
-                                        <label>Position:</label>
-                                        <input placeholder="Position" name="position" className="form-control"
-                                        value={this.state.Position} onChange={this.changePositionHandler}></input>
-                                    </div>
-                                    <div className="form-group">
-                                        <label>Superior:</label>
-                                        <input placeholder="Superior" name="superior" className="form-control"
-                                        value={this.state.Superior} onChange={this.changeSuperiorHandler}></input>
-                                    </div>
-                                    <div className="form-group">
-                                        <label>Phone No.:</label>
-                                        <input placeholder="Phone No." name="phone" className="form-control"
-                                        value={this.state.PhoneNo} onChange={this.changePhoneHandler}></input>
-                                    </div>
-                                    <div className="form-group">
-                                        <label>Experience Years:</label>
-                                        <input placeholder="Experience Year" name="phone" className="form-control"
-                                        value={this.state.ExperienceYear} onChange={this.changeExperienceYearHandler}></input>
-                                    </div>
-                                    <div className="form-group">
-                                        <label>Office Location:</label>
-                                        <input placeholder="Office Location" name="phone" className="form-control"
-                                        value={this.state.OfficeLocation} onChange={this.changeOfficeLocationHandler}></input>
-                                    </div>
-                                    <div className="form-group">
-                                        <label>Address:</label>
-                                        <textarea rows="3" placeholder="Address" name="phone" className="form-control"
-                                        value={this.state.Address} onChange={this.changeAddressHandler}></textarea >
-                                    </div>
-                                    <div className="form-group">
-                                        <label>Date of Birth:</label>
-                                        <input placeholder="DD/MM/YYYY" name="phone" className="form-control"
-                                        value={this.state.DOB} onChange={this.changeDOBHandler}></input>
-                                    </div>
-                                    <div className="form-group">
-                                        <label>Date Joined:</label>
-                                        <input placeholder="DD/MM/YYYY" name="phone" className="form-control"
-                                        value={this.state.DateJoined} onChange={this.changeDateJoinedHandler}></input>
+                                        <input  id="validationCustom01" placeholder="Name"  className="form-control"
+                                        value={this.state.name} onChange={this.changeNameHandler} ></input>
+                                        <small id="passwordHelp" class="text-danger">{this.state.nameError} </small> 
                                     </div>
 
-                                    <button className="btn btn-info" onClick={this.saveEmployee}>Save</button>
+
+                                    <div className="form-row">
+                                     <div className="form-group col-md-6">
+                                            <label>Username:</label>
+                                            <input placeholder="Username"  className="form-control"
+                                            value={this.state.Username} onChange={this.changeUsernameHandler} ></input>
+                                            <small id="passwordHelp" class="text-danger">{this.state.usernameError} </small> 
+                                    </div>
+                                        
+                                    <div className="form-group col-md-6">
+                                            <label>Password:</label>
+                                            <input placeholder="Password" type="password" className="form-control"
+                                            value={this.state.Password} onChange={this.changePasswordHandler} ></input>
+                                            <small id="passwordHelp" class="text-danger">{this.state.passwordError} </small>
+                                    </div>
+                                    </div>
+                                    
+
+                                    <div className="form-group">
+                                        <label>Employee Id:</label>
+                                        <input placeholder="Employee Id"  className="form-control"
+                                        value={this.state.EmployeeId} onChange={this.changeEmployeeIdHandler} ></input>
+                                        <small id="passwordHelp" class="text-danger">{this.state.employeeError} </small>
+                                    </div>
+
+
+                                    <div className="form-group">
+                                        <label>Department:</label>
+                                        <input placeholder="Department" className="form-control"
+                                        value={this.state.Department} onChange={this.changeDepartmentHandler} ></input>
+                                    </div>
+
+
+                                    <div className="form-group">
+                                        <label>Email:</label>
+                                        <input type="email"  placeholder="Email" className="form-control"
+                                        value={this.state.Email} onChange={this.changeEmailHandler} ></input>
+                                        <small id="passwordHelp" class="text-danger">{this.state.emailError} </small>
+                                    </div>
+
+
+                                    <div className="form-group">
+                                        <label>Position:</label>
+                                        <input ptype="email" placeholder="Position" className="form-control"
+                                        value={this.state.Position} onChange={this.changePositionHandler} ></input>
+                                    </div>
+
+
+                                    <div className="form-group">
+                                        <label>Superior:</label>
+                                        <input placeholder="Superior" className="form-control"
+                                        value={this.state.Superior} onChange={this.changeSuperiorHandler} ></input>
+                                    </div>
+
+
+                                    <div className="form-group">
+                                        <label>Phone No.:</label>
+                                        <input placeholder="Phone No." className="form-control"
+                                        value={this.state.PhoneNo} onChange={this.changePhoneHandler} ></input>
+                                    </div>
+
+
+                                    <div className="form-group">
+                                        <label>Experience Years:</label>
+                                        <input placeholder="Experience Year"  className="form-control"
+                                        value={this.state.ExperienceYear} onChange={this.changeExperienceYearHandler} ></input>
+                                        <small id="passwordHelp" class="text-danger">{this.state.experienceError} </small>
+                                    </div>
+
+
+                                    <div className="form-group">
+                                        <label>Office Location:</label>
+                                        <input placeholder="Office Location" className="form-control"
+                                        value={this.state.OfficeLocation} onChange={this.changeOfficeLocationHandler}></input>
+                                    </div>
+
+
+                                    <div className="form-group">
+                                        <label>Address:</label>
+                                        <textarea rows="3" placeholder="Address"  className="form-control"
+                                        value={this.state.Address} onChange={this.changeAddressHandler} ></textarea >
+                                    </div>
+
+
+                                    <div className="form-group">
+                                        <label>Date of Birth: </label>
+                                        <TextField id="datefield"  type="date" value={this.state.DOB} onChange={this.changeDOBHandler} InputLabelProps={{shrink: true,}}/>
+                                        {/* <input placeholder="DD/MM/YYYY"  type="date" id="datefield" className="datepicker" data-date-format="mm/dd/yyyy" startDate= '-3d'
+                                        ></input> */}
+                                    </div>
+
+
+                                    <div className="form-group">
+                                        <label>Date Joined: </label>
+                                        <TextField id="datefield"  type="date" value={this.state.DateJoined} onChange={this.changeDateJoinedHandler} InputLabelProps={{shrink: true,}}/>
+                                        {/* <input placeholder="DD/MM/YYYY"  type="date" data-date-format="mm/dd/yyyy"
+                                        value={this.state.DateJoined} onChange={this.changeDateJoinedHandler} ></input> */}
+                                    </div>
+
+
+                                    <button className="btn float-left" onClick={this.goBack}>Cancel</button>
+                                    <button type="submit" className="btn btn-primary  btn-rounded float-right" onClick={this.checker}>Save</button>
                                 </form>
                             </div>
-                        </div>
+                        
                     </div>
                 </div>
             </div>

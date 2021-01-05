@@ -16,20 +16,25 @@ public class Employee {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private int id;
-	private String EmployeeId;
+	private String employeeId;
 	private String Department;
 	private String DateJoined;
-	private String Email;
+	private String email;
 	private String Address;
+	private int softDelete;
+	private int active;
 //	@Lob
 //	private Blob content;
-	private String Name;
+	private byte[] file;
+	private String fileName;
+	private String name;
 	private String DOB;
 	private String Position;
 	private String Superior;
 	private int experienceYears;
 	private String contactNumber;
 	private String officeLocation;
+	private String userName;
 	
 //	@ManyToOne
 //	@JoinColumn(name="user_id")
@@ -42,10 +47,10 @@ public class Employee {
 		id = Id;
 	}
 	public String getEmployeeId() {
-		return EmployeeId;
+		return employeeId;
 	}
-	public void setEmployeeId(String employeeId) {
-		EmployeeId = employeeId;
+	public void setEmployeeId(String EmployeeId) {
+		employeeId = EmployeeId;
 	}
 	public String getDepartment() {
 		return Department;
@@ -59,11 +64,11 @@ public class Employee {
 	public void setDateJoined(String dateJoined) {
 		DateJoined = dateJoined;
 	}
-	public String geteMail() {
-		return Email;
+	public String getEmail() {
+		return email;
 	}
-	public void seteMail(String eMail) {
-		this.Email = eMail;
+	public void setEmail(String Email) {
+		this.email = Email;
 	}
 	public String getAddress() {
 		return Address;
@@ -72,17 +77,11 @@ public class Employee {
 		Address = address;
 	}
 	
-//	public Blob getPhoto() {
-//		return Photo;
-//	}
-//	public void setPhoto(Blob photo) {
-//		Photo = photo;
-//	}
 	public String getName() {
-		return Name;
+		return name;
 	}
-	public void setName(String name) {
-		Name = name;
+	public void setName(String Name) {
+		name = Name;
 	}
 	public String getDOB() {
 		return DOB;
@@ -120,11 +119,45 @@ public class Employee {
 	public void setOfficeLocation(String officeLocation) {
 		this.officeLocation = officeLocation;
 	}
+	public String getUserName() {
+		return userName;
+	}
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+	public int getActive() {
+		return active;
+	}
+	public void setActive(int active) {
+		this.active = active;
+	}
+	public int getSoftDelete() {
+		return softDelete;
+	}
+	public void setSoftDelete(int softDelete) {
+		this.softDelete = softDelete;
+	}
+	
+	public Employee() {
+	}
+	public Employee(byte[] file, String fileName) {
+		this.file = file;
+		this.fileName = fileName;
+	}
+	public byte[] getFile() {
+		return file;
+	}
+	public void setFile(byte[] file) {
+		this.file = file;
+	}
+	public String getFileName() {
+		return fileName;
+	}
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
 
 	
+	
 
-	
-	
-	
-	
 }

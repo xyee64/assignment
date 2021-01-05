@@ -1,27 +1,27 @@
 import React, { Component } from 'react';
 import HttpService from '../Services/HttpService';
-
-
 export class EmployeeProfile extends Component {
     constructor(props){
         super(props)
         this.state = {
             readOnly:true,
-            id:this.props.match.params.id,
-            name:"",
-            EmployeeId:"",
-            Department:"",
-            Email:"",
-            Position:"",
-            Superior:"",
-            PhoneNo:"",
-            ExperienceYear:"",
-            OfficeLocation:"",
-            Address:"",
-            DOB:"",
-            DateJoined:""
+            id:"id",
+            name:"name",
+            username:JSON.parse(localStorage.getItem('user')).username,
+            EmployeeId:"employeeid",
+            Department:"department",
+            Email:"email",
+            Position:"position",
+            Superior:"superior",
+            PhoneNo:"phone no",
+            ExperienceYear:"experience",
+            OfficeLocation:"location",
+            Address:"address",
+            DOB:"dob",
+            DateJoined:"date",
+            active:"",
+            softDelete:""
         }
-
         this.changePhoneHandler = this.changePhoneHandler.bind(this);
         this.changeAddressHandler = this.changeAddressHandler.bind(this);
         this.saveEmployee = this.saveEmployee.bind(this);
@@ -30,14 +30,15 @@ export class EmployeeProfile extends Component {
     }
 
     componentDidMount(){
-        console.log(this.state.id)
-        HttpService.getEmployeeById(this.state.id).then((res)=>{
-            let employee=res.data;
+        HttpService.getEmployeeByName(this.state.username).then((res)=>{
+            let employee=res.data[0];
+            console.log(employee)
             this.setState({
+                id:employee.id,
                 name:employee.name,
                 EmployeeId:employee.employeeId,
                 Department:employee.department,
-                Email:employee.eMail,
+                Email:employee.email,
                 Position:employee.position,
                 Superior:employee.superior,
                 PhoneNo:employee.contactNumber,
@@ -45,7 +46,10 @@ export class EmployeeProfile extends Component {
                 OfficeLocation:employee.officeLocation,
                 Address:employee.address,
                 DOB:employee.dob,
-                DateJoined:employee.dateJoined
+                DateJoined:employee.dateJoined,
+                active:employee.active,
+                softDelete:employee.softDelete
+                
             })
         }
         )
@@ -76,7 +80,7 @@ export class EmployeeProfile extends Component {
             name:this.state.name, 
             employeeId:this.state.EmployeeId,
             department:this.state.Department,
-            eMail:this.state.Email,
+            email:this.state.Email,
             position:this.state.Position,
             superior:this.state.Superior,
             contactNumber:this.state.PhoneNo,
@@ -84,9 +88,13 @@ export class EmployeeProfile extends Component {
             officeLocation:this.state.OfficeLocation,
             address:this.state.Address,
             dob:this.state.DOB,
-            dateJoined:this.state.DateJoined};
+            dateJoined:this.state.DateJoined,
+            userName:this.state.username,
+            active:this.state.active,
+            softDelete:this.state.softDelete};
         HttpService.createEmployee(employee).then(res =>{
-            this.props.history.push('/');
+            this.props.history.push('/profile');
+            this.setState(prevState => ({readOnly: !prevState.readOnly}));
         })
     }
 
