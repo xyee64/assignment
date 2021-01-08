@@ -44,6 +44,7 @@ OnDelete(item){
         dob:item.dob,
         dateJoined:item.dateJoined,
         userName:item.userName,
+        photo:item.photo,
         active:0,
         softDelete:1};
         console.log(employee)

@@ -25,8 +25,6 @@ public class Employee {
 	private int active;
 //	@Lob
 //	private Blob content;
-	private byte[] file;
-	private String fileName;
 	private String name;
 	private String DOB;
 	private String Position;
@@ -35,6 +33,9 @@ public class Employee {
 	private String contactNumber;
 	private String officeLocation;
 	private String userName;
+	private String photo;
+	private String attachment;
+	private String attachmentName;
 	
 //	@ManyToOne
 //	@JoinColumn(name="user_id")
@@ -76,7 +77,6 @@ public class Employee {
 	public void setAddress(String address) {
 		Address = address;
 	}
-	
 	public String getName() {
 		return name;
 	}
@@ -137,26 +137,28 @@ public class Employee {
 	public void setSoftDelete(int softDelete) {
 		this.softDelete = softDelete;
 	}
+	public String getPhoto() {
+		return photo;
+	}
+	public void setPhoto(String photo) {
+		this.photo = photo;
+	}
+	public String getAttachment() {
+		return attachment;
+	}
+	public void setAttachment(String attachment) {
+		this.attachment = attachment;
+	}
+	public String getAttachmentName() {
+		return attachmentName;
+	}
+	public void setAttachmentName(String attachmentName) {
+		this.attachmentName = attachmentName;
+	}
 	
-	public Employee() {
-	}
-	public Employee(byte[] file, String fileName) {
-		this.file = file;
-		this.fileName = fileName;
-	}
-	public byte[] getFile() {
-		return file;
-	}
-	public void setFile(byte[] file) {
-		this.file = file;
-	}
-	public String getFileName() {
-		return fileName;
-	}
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
-	}
+	
 
+	
 	
 	
 

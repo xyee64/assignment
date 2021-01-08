@@ -9,18 +9,18 @@ export class Navbar extends Component {
     this.logout = this.logout.bind(this);
 
     this.state = {
-      isHidden:true
+      isHidden:true,
+      username:""
     };
     this.logout=this.logout.bind(this);
 }
 
 componentDidMount(){
-
-   if( localStorage.getItem('user')!=null){
-     this.setState({isHidden:false})
-   }
+  if( localStorage.getItem('user')!=null){
+    this.setState({isHidden:false,
+      username:JSON.parse(localStorage.getItem('user')).username})
+  }
 }
-
   logout(){
     this.setState({isHidden:true})
     localStorage.removeItem("user");
@@ -35,10 +35,11 @@ componentDidMount(){
                   {/* <li ><NavLink  className="nav-menu__link" activeClassName="activate" exact to="/home">Home</NavLink></li>
                   <li ><NavLink className="nav-menu__link" activeClassName="activate" exact to="/create">Create</NavLink></li> */}
                   <form className="form-inline my-2 my-lg-0 ml-auto">
+                    
                        {/* <button hidden={this.state.isHidden} className="btn btn-outline-success my-2 my-sm-0"  type="submit"><NavLink onClick={this.logout} className="nav-menu__link" activeClassName="activate" exact to="/">Logout</NavLink></button> */}
                        <Dropdown >
                         <Dropdown.Toggle className="dropdown" hidden={this.state.isHidden} variant="dark" id="dropdown-basic">
-                         
+                        <p hidden = {this.state.isHidden} className="navbar-brand nav-name">Hi, {this.state.username}</p> 
                         </Dropdown.Toggle>
                         <Dropdown.Menu >
                           <Dropdown.Item href="change_password">Change Password</Dropdown.Item>

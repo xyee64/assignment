@@ -100,21 +100,4 @@ public class EmployeeController {
 		return employeeService.findByUserName(name);
 	}
 	
-	@PostMapping("/employee/upload")
-	@PreAuthorize("hasAuthority('ADMIN')")
-	public ResponseEntity<MessageResponse> uploadFile(@RequestParam("file") MultipartFile file){
-		String message="";
-		try {
-			employeeService.store(file);
-			
-			message="Uploaded file successfully:" + file.getOriginalFilename();
-			return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse(message));		
-		}
-		catch(Exception e) {
-			message = "Could not upload the file:" + file.getOriginalFilename();
-			return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new MessageResponse(message));		
-		}
-	}
-
-
 }

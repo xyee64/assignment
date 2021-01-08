@@ -20,13 +20,15 @@ export class EmployeeProfile extends Component {
             DOB:"dob",
             DateJoined:"date",
             active:"",
-            softDelete:""
+            softDelete:"",
+            photo:""
         }
         this.changePhoneHandler = this.changePhoneHandler.bind(this);
         this.changeAddressHandler = this.changeAddressHandler.bind(this);
         this.saveEmployee = this.saveEmployee.bind(this);
         this._click = this._click.bind(this);
         this._cancel = this._cancel.bind(this);
+        console.log("employee:",+this.state.employee)
     }
 
     componentDidMount(){
@@ -48,8 +50,8 @@ export class EmployeeProfile extends Component {
                 DOB:employee.dob,
                 DateJoined:employee.dateJoined,
                 active:employee.active,
-                softDelete:employee.softDelete
-                
+                softDelete:employee.softDelete,
+                photo: employee.photo
             })
         }
         )
@@ -91,7 +93,8 @@ export class EmployeeProfile extends Component {
             dateJoined:this.state.DateJoined,
             userName:this.state.username,
             active:this.state.active,
-            softDelete:this.state.softDelete};
+            softDelete:this.state.softDelete,
+            photo:this.state.photo};
         HttpService.createEmployee(employee).then(res =>{
             this.props.history.push('/profile');
             this.setState(prevState => ({readOnly: !prevState.readOnly}));
@@ -108,6 +111,12 @@ export class EmployeeProfile extends Component {
                         <h3 className="text-center">Profile</h3>
                         <div className="card-body">
                             <form>
+                                <div className="img-holder">
+                                    <img src={this.state.photo ||'http://ky.myacpa.org/wp-content/uploads/2019/10/blank-profile-picture-coming-soon.png'}
+                                    alt="Profile_Picture" className="img"/>
+                                    <br /> 
+                                </div>
+
                                 <div className="form-group">
                                     <label>Name:</label>
                                     <input placeholder="Name" name="name" className="form-control"

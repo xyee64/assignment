@@ -95,11 +95,4 @@ public class EmployeeServiceImpl implements EmployeeService{
 	public List<Employee> findByActive(int active) {
 		return employeeRepository.findByActive(active);
 	}
-	@Override
-	public Employee store(MultipartFile file) throws IOException {
-		String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-		Employee Employee= new Employee(file.getBytes(),  fileName);
-		return employeeRepository.save(Employee);
-	}
-
 }

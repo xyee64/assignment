@@ -60,6 +60,7 @@ OnRestore(item){
         dob:item.dob,
         dateJoined:item.dateJoined,
         userName:item.userName,
+        photo:item.photo,
         active:1,
         softDelete:0};
         this.setState({employees:[]})
@@ -101,6 +102,11 @@ goCreate=(e)=>{
     e.preventDefault();
     this.props.history.push(`/register`);
 }
+
+goBack=(e)=>{
+    e.preventDefault();
+    this.props.history.goBack();
+}
     render(){
         return(
             
@@ -138,13 +144,14 @@ goCreate=(e)=>{
                                     <td>{item.superior}</td>
                                     <td><button type="button" onClick={()=>this.OnDetails(item.id)} className="btn btn-primary">Details</button>
                                     <button type="button" className="btn btn-danger" onClick={()=>window.confirm("Are you sure you wish to delete this item?") && this.OnDelete(item)}>Delete</button>
-                                    <button type="button" className="btn btn-danger" onClick={()=>window.confirm("Are you sure you wish to restore this item?") && this.OnRestore(item)}>Retore</button>
+                                    <button type="button" className="btn btn-danger" onClick={()=>window.confirm("Are you sure you wish to restore this item?") && this.OnRestore(item)}>Restore</button>
                                     </td>
                                 </tr>
                               ))
                             }
                         </tbody>
                     </table>
+                    <button type="button" onClick={this.goBack} className="btn btn-dark">Back</button>
                 </div>
             </div>
         )

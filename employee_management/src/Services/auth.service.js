@@ -42,6 +42,12 @@ class AuthService {
     formData.append("password",password)
     return axios.post("http://localhost:8080/change_password", formData, { headers: authHeader()})
   }
+  resetPassword(token, password) {
+    let formData = new FormData();
+    formData.append("token", token);
+    formData.append("password", password);
+    return axios.post("http://localhost:8080/reset_password", formData);
+  }
 }
 
 export default new AuthService();

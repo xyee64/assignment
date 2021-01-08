@@ -20,6 +20,5 @@ public interface EmployeeService {
 	public String IdExist(Employee employee);
 	List<Employee> findBySoftDelete(int softdel);
 	List<Employee> findByActive(int active);
-	public Employee store(MultipartFile file)throws IOException;
 }
 

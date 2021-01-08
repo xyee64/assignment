@@ -51,7 +51,7 @@ export class ChangePassword extends Component {
             problems:1 })
         }
 
-        if(this.state.password!=this.state.confirmPassword){
+        if(this.state.password!==this.state.confirmPassword){
             window.scrollTo(0,0);
             this.setState({confirmPasswordError:"Password not match",
                            problems:1 })

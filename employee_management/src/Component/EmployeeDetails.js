@@ -18,7 +18,10 @@ export class EmployeeDetails extends Component {
             Address:"",
             DOB:"",
             DateJoined:"",
-            username:""
+            username:"",
+            photo:"",
+            attachment:"",
+            attachmentName:""
         }
     }
 
@@ -39,7 +42,10 @@ export class EmployeeDetails extends Component {
                 Address:employee.address,
                 DOB:employee.dob,
                 DateJoined:employee.dateJoined,
-                username:employee.userName
+                username:employee.userName,
+                photo:employee.photo,
+                attachment:employee.attachment,
+                attachmentName:employee.attachmentName
             })
         }
         )
@@ -47,7 +53,7 @@ export class EmployeeDetails extends Component {
 
     goBack = (e) =>{
         e.preventDefault();
-        this.props.history.push('/admin');
+        this.props.history.goBack();
     }
 
 
@@ -60,6 +66,12 @@ export class EmployeeDetails extends Component {
                         <h3 className="text-center">{this.state.name}</h3>
                         <div className="card-body">
                             <form>
+                                <div className="img-holder">
+                                    <img src={this.state.photo ||'http://ky.myacpa.org/wp-content/uploads/2019/10/blank-profile-picture-coming-soon.png'}
+                                    alt="Profile_Picture" className="img"/>
+                                    <br /> 
+                                </div>
+
                                 <div className="form-group">
                                     <label>Name:</label>
                                     <input placeholder="Name" name="name" className="form-control"
@@ -124,6 +136,15 @@ export class EmployeeDetails extends Component {
                                     <label>Date Joined:</label>
                                     <input placeholder="DD/MM/YYYY" name="phone" className="form-control"
                                     value={this.state.DateJoined} onChange={this.changeDateJoinedHandler} readOnly></input>
+                                </div>
+
+                                <div>
+                                    <br/>
+                                    <label>Attachment:</label>
+                                    <hr/>
+                                    <ul>
+                                    <a href={this.state.attachment} rel="case"> {this.state.attachmentName}</a>
+                                    </ul>
                                 </div>
                                 <button className="btn btn-primary float-right" onClick={this.goBack}>Back</button>
                             </form>

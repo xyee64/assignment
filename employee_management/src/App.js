@@ -12,6 +12,7 @@ import SoftDelete from './Component/SoftDelete';
 import ForgotPassword from './Component/ForgotPassword';
 import ChangePassword from './Component/ChangePassword';
 import './App.css';
+import ResetPassword from './Component/ResetPassword';
 
 export class App extends Component {
   
@@ -31,6 +32,7 @@ export class App extends Component {
           <Route path="/register" component={CreateEmployee} />
           <Route path="/forgot_password" component={ForgotPassword}/>
           <Route path="/change_password" component={ChangePassword}/>
+          <Route path="/reset_password/" component={ResetPassword}/>
         </Switch>
         </div>
         </Router>

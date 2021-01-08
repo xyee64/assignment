@@ -3,6 +3,8 @@ import HttpService from '../Services/HttpService';
 import AuthService from '../Services/auth.service';
 import TextField from '@material-ui/core/TextField';
 import "react-datepicker/dist/react-datepicker.css";
+import {storage} from '../firebase';
+
 class CreateEmployee extends Component{
     
     constructor(props){
@@ -28,7 +30,9 @@ class CreateEmployee extends Component{
             emailError:"",
             experienceError:"",
             employeeError:"",
-            problems:""
+            problems:"",
+            photo:"",
+            attachment:"",
         }
         this.changeNameHandler = this.changeNameHandler.bind(this);
         this.changeEmployeeIdHandler = this.changeEmployeeIdHandler.bind(this);
@@ -44,6 +48,8 @@ class CreateEmployee extends Component{
         this.changeDateJoinedHandler = this.changeDateJoinedHandler.bind(this);
         this.changePasswordHandler = this.changePasswordHandler.bind(this);
         this.changeUsernameHandler = this.changeUsernameHandler.bind(this);
+        this.changePhotoHandler = this.changePhoneHandler.bind(this);
+        this.changeAttachmentHandler = this.changeAttachmentHandler.bind(this);
         this.saveEmployee = this.saveEmployee.bind(this);
         this.checker= this.checker.bind(this);
         this.emailValidation= this.emailValidation.bind(this);
@@ -110,6 +116,12 @@ class CreateEmployee extends Component{
     }
     changeUsernameHandler =(event)=>{
         this.setState({username: event.target.value.toLowerCase()});
+    }
+    changePhotoHandler =(event)=>{
+        this.setState({phtoto: event.target.value});
+    }
+    changeAttachmentHandler =(event)=>{
+        this.setState({attachment: event.target.value});
     }
 
     emailchecker(checklist){
@@ -234,6 +246,8 @@ class CreateEmployee extends Component{
             address:this.state.Address,
             dob:this.state.DOB,
             dateJoined:this.state.DateJoined,
+            photo:this.state.photo,
+            attachment:this.state.attachment,
             active:1};
         let details = {
             username:this.state.username,
@@ -252,6 +266,68 @@ class CreateEmployee extends Component{
         this.props.history.push('/admin');
     }
     render(){
+        const uploadImage = (e) => {
+            const image = e.target.files[0];
+            const uploadTask = storage.ref(`images/${image.name}`).put(image);
+            uploadTask.on(
+              "state_changed",
+              (snapshot) => {
+                // progress function ....
+                const progress = Math.round(
+                  (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+                );
+                this.setState({ progress });
+              },
+              (error) => {
+                // error function ....
+                console.log(error);
+              },
+              () => {
+                // complete function ....
+                storage
+                  .ref("images")
+                  .child(image.name)
+                  .getDownloadURL()
+                  .then((url) => {
+                    console.log(url);
+                    this.setState({ photo: url });
+                  });
+              }
+            );
+          };
+
+          const uploadAttachment = (e) => {
+            const attachment = e.target.files[0];
+            const attachmentName = e.target.files[0].name;
+            const uploadTask = storage.ref(`attachment/${attachmentName}`).put(attachment);
+            uploadTask.on(
+              "state_changed",
+              (snapshot) => {
+                // progress function ....
+                const progress = Math.round(
+                  (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+                );
+                this.setState({ progress });
+              },
+              (error) => {
+                // error function ....
+                console.log(error);
+              },
+              () => {
+                // complete function ....
+                this.setState({attachmentName:attachmentName})
+                storage
+                  .ref("attachment")
+                  .child(attachmentName)
+                  .getDownloadURL()
+                  .then((url) => {
+                    console.log(attachmentName)
+                    console.log(url);
+                    this.setState({ attachment: url });
+                  });
+              }
+            );
+          };
         return(
             <div>
                 <div className="details-form">
@@ -260,6 +336,20 @@ class CreateEmployee extends Component{
                             <h3 className="text-center">Add Employee</h3>
                             <div className="card-body">
                                 <form>
+                                    <div className="img-holder">
+                                        <img src={this.state.photo || 'http://ky.myacpa.org/wp-content/uploads/2019/10/blank-profile-picture-coming-soon.png'}
+                                        alt="Profile_Picture" className="img"/>
+                                    </div>
+                                        {/* <progress value={this.state.progress} max="100" /> */}
+                                        {/* <br /> */}
+                                        <input type="file" name="photo-upload"id="photo-upload" onChange={uploadImage} />
+                                    <div className="upload-icon">
+                                        <label htmlFor="photo-upload" className="photo-upload">
+                                                <i className="material-icons">add_photo_alternate</i>
+                                                Choose Your Photo
+                                        </label>
+                                    </div>
+                                    
                                     <div className="form-group">
                                         <label>Name:</label>
                                         <input  id="validationCustom01" placeholder="Name"  className="form-control"
@@ -269,7 +359,7 @@ class CreateEmployee extends Component{
 
 
                                     <div className="form-row">
-                                     <div className="form-group col-md-6">
+                                    <div className="form-group col-md-6">
                                             <label>Username:</label>
                                             <input placeholder="Username"  className="form-control"
                                             value={this.state.Username} onChange={this.changeUsernameHandler} ></input>
@@ -366,6 +456,15 @@ class CreateEmployee extends Component{
                                         value={this.state.DateJoined} onChange={this.changeDateJoinedHandler} ></input> */}
                                     </div>
 
+                                    <div>
+                                    <label>Attachment</label>
+                                    <br/>
+                                    <input type="file" multiple onChange={uploadAttachment} ></input>
+                                    <hr/>
+                                    <ul>
+                                    <a href={this.state.attachment} rel="case"> {this.state.attachmentName}</a>
+                                    </ul>
+                                </div>
 
                                     <button className="btn float-left" onClick={this.goBack}>Cancel</button>
                                     <button type="submit" className="btn btn-primary  btn-rounded float-right" onClick={this.checker}>Save</button>

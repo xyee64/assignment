@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import HttpService from '../Services/HttpService';
 import TextField from '@material-ui/core/TextField';
+import {storage} from '../firebase';
 
 class EditEmployee extends Component{
     constructor(props){
@@ -21,7 +22,10 @@ class EditEmployee extends Component{
             DOB:"",
             DateJoined:"",
             active:"",
-            softDelete:""
+            softDelete:"",
+            photo:"",
+            attachment:"",
+            attachmentName:""
         }
         this.changeNameHandler = this.changeNameHandler.bind(this);
         this.changeEmployeeIdHandler = this.changeEmployeeIdHandler.bind(this);
@@ -36,6 +40,9 @@ class EditEmployee extends Component{
         this.changeDOBHandler = this.changeDOBHandler.bind(this);
         this.changeDateJoinedHandler = this.changeDateJoinedHandler.bind(this);
         this.changeUsernameHandler = this.changeUsernameHandler.bind(this);
+        this.changePhotoHandler = this.changePhotoHandler.bind(this);
+        this.changeAttachmentHandler = this.changeAttachmentHandler.bind(this);
+        this.changeAttachmentNameHandler = this.changeAttachmentNameHandler.bind(this);
         this.saveEmployee = this.saveEmployee.bind(this);
     }
 
@@ -58,7 +65,10 @@ class EditEmployee extends Component{
                 DateJoined:employee.dateJoined,
                 userName:employee.userName,
                 active:employee.active,
-                softDelete:employee.softDelete
+                softDelete:employee.softDelete,
+                photo:employee.photo,
+                attachment:employee.attachment,
+                attachmentName:employee.attachmentName,
             })
         }
         )
@@ -103,6 +113,15 @@ class EditEmployee extends Component{
     changeUsernameHandler =(event)=>{
         this.setState({userName: event.target.value});
     }
+    changePhotoHandler = (event)=>{
+        this.setState({photo: event.target.value});
+    }
+    changeAttachmentHandler =(event)=>{
+        this.setState({attachment: event.target.value});
+    }
+    changeAttachmentNameHandler =(event)=>{
+        this.setState({attachmentName:event.target.value});
+    }
 
     dateLock =()=>{
         var today = new Date();
@@ -143,15 +162,81 @@ class EditEmployee extends Component{
             dateJoined:this.state.DateJoined,
             userName:this.state.userName,
             active:this.state.active,
-            softDelete:this.state.softDelete};
+            softDelete:this.state.softDelete,
+            photo:this.state.photo,
+            attachment:this.state.attachment,
+            attachmentName:this.state.attachmentName};
 
         HttpService.createEmployee(employee).then(res =>{
             this.props.history.push('/admin');
         })
     }
 
+    
 
     render(){
+        const uploadImage = (e) => {
+            const image = e.target.files[0];
+            const uploadTask = storage.ref(`images/${image.name}`).put(image);
+            uploadTask.on(
+              "state_changed",
+              (snapshot) => {
+                // progress function ....
+                const progress = Math.round(
+                  (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+                );
+                this.setState({ progress });
+              },
+              (error) => {
+                // error function ....
+                console.log(error);
+              },
+              () => {
+                // complete function ....
+                storage
+                  .ref("images")
+                  .child(image.name)
+                  .getDownloadURL()
+                  .then((url) => {
+                    console.log(url);
+                    this.setState({ photo: url });
+                  });
+              }
+            );
+          };
+
+          const uploadAttachment = (e) => {
+            const attachment = e.target.files[0];
+            const attachmentName = e.target.files[0].name;
+            const uploadTask = storage.ref(`attachment/${attachmentName}`).put(attachment);
+            uploadTask.on(
+              "state_changed",
+              (snapshot) => {
+                // progress function ....
+                const progress = Math.round(
+                  (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+                );
+                this.setState({ progress });
+              },
+              (error) => {
+                // error function ....
+                console.log(error);
+              },
+              () => {
+                // complete function ....
+                this.setState({attachmentName:attachmentName})
+                storage
+                  .ref("attachment")
+                  .child(attachmentName)
+                  .getDownloadURL()
+                  .then((url) => {
+                    console.log(attachmentName)
+                    console.log(url);
+                    this.setState({ attachment: url });
+                  });
+              }
+            );
+          };
         return(
             <div>
             <div className="container">
@@ -160,6 +245,20 @@ class EditEmployee extends Component{
                         <h3 className="text-center">Edit Employee</h3>
                         <div className="card-body">
                             <form>
+                                <div className="img-holder">
+                                        <img src={this.state.photo || 'http://ky.myacpa.org/wp-content/uploads/2019/10/blank-profile-picture-coming-soon.png'}
+                                        alt="Profile_Picture" className="img"/>
+                                    </div>
+                                        {/* <progress value={this.state.progress} max="100" /> */}
+                                        {/* <br /> */}
+                                        <input type="file" name="photo-upload"id="photo-upload" onChange={uploadImage} />
+                                    <div className="upload-icon">
+                                        <label htmlFor="photo-upload" className="photo-upload">
+                                                <i className="material-icons">add_photo_alternate</i>
+                                                Choose Your Photo
+                                        </label>
+                                </div>
+
                                 <div className="form-group">
                                     <label>Name:</label>
                                     <input placeholder="Name" name="name" className="form-control"
@@ -220,6 +319,17 @@ class EditEmployee extends Component{
                                     <label>Date Joined: </label>
                                     <TextField id="datefield"  type="date" value={this.state.DateJoined} onChange={this.changeDateJoinedHandler} InputLabelProps={{shrink: true,}}/>
                                 </div>
+
+                                <div>
+                                    <label>Attachment</label>
+                                    <br/>
+                                    <input type="file" multiple onChange={uploadAttachment} ></input>
+                                    <hr/>
+                                    <ul>
+                                    <a href={this.state.attachment} rel="case"> {this.state.attachmentName}</a>
+                                    </ul>
+                                </div>
+
                                 <button className="btn float-left" onClick={this.goBack}>Cancel</button>
                                 <button className="btn float-right btn-info" onClick={this.saveEmployee}>Save</button>
                             </form>
