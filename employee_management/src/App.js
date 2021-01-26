@@ -15,6 +15,26 @@ import './App.css';
 import ResetPassword from './Component/ResetPassword';
 
 export class App extends Component {
+
+  constructor(props){
+    super(props)
+    this.state= {
+      values:[]
+    }
+  }
+
+
+  // componentDidMount(){
+  //   if(localStorage.getItem('user')!=null){
+  //     setTimeout(this.alertFunc, 600000);
+  //   }
+  // }
+
+  // alertFunc() {
+  //   localStorage.removeItem("user")
+  //   console.log("Hello!");
+  //   window.location.href="/"
+  // }
   
   render() {
     return (

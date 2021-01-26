@@ -4,6 +4,8 @@ import AuthService from '../Services/auth.service';
 import TextField from '@material-ui/core/TextField';
 import "react-datepicker/dist/react-datepicker.css";
 import {storage} from '../firebase';
+import Accordion from 'react-bootstrap/Accordion';
+import Card from 'react-bootstrap/Card';
 
 class CreateEmployee extends Component{
     
@@ -55,6 +57,14 @@ class CreateEmployee extends Component{
         this.emailValidation= this.emailValidation.bind(this);
     }
     componentDidMount(){
+        if(JSON.parse(localStorage.getItem('user'))===null){
+            this.props.history.push(`/`);
+        }
+        if(JSON.parse(localStorage.getItem('user'))!==null){
+            if(JSON.parse(localStorage.getItem('user')).roles[0]!=="ADMIN"){
+                this.props.history.push(`/profile`);
+            }
+        }
         this.dateLock()
     }
 
@@ -129,15 +139,16 @@ class CreateEmployee extends Component{
         if(this.emailValidation(this.state.Email)===false){
             window.scrollTo(0,0);
             this.setState({emailError:"Please enter a valid email address",
-                           problems:1 })
+                           problems:1 },()=>{this.usernamechecker(checklist)})
         }else
 
         if(this.emailValidation(this.state.Email)){
             HttpService.CheckMail(checklist).then(res =>{
                 if(res.data==="Email Taken"){
                     this.setState({emailError:res.data,
-                        problems:1 })
-                }
+                        problems:1 },()=>{this.usernamechecker(checklist)})
+                }else
+                {this.usernamechecker(checklist)}
             })
         }
     }
@@ -145,23 +156,25 @@ class CreateEmployee extends Component{
         if(this.state.username===""){
             window.scrollTo(0,0);
             this.setState({usernameError:"Please enter a user name",
-            problems:1 })
+            problems:1 },()=>{this.namechecker(checklist)})
         }else
         if(this.state.username!==""){
             HttpService.CheckUsername(checklist).then(res =>{
                 if(res.data==="Username Taken"){
                     this.setState({usernameError:res.data,
-                        problems:1 })
-                }
+                        problems:1 },()=>{this.namechecker(checklist)})
+                }else{this.namechecker(checklist)}
             })
         }
     }
 
-    namechecker(){
+    namechecker(checklist){
         if(this.state.name===""){
             window.scrollTo(0,0);
             this.setState({nameError:"Please enter a name",
-            problems:1 })
+            problems:1 },()=>{this.employeeidchecker(checklist)})
+        }else{
+            this.employeeidchecker(checklist);
         }
     }
 
@@ -169,14 +182,16 @@ class CreateEmployee extends Component{
         if(this.state.EmployeeId===""){
             window.scrollTo(0,0);
             this.setState({employeeError:"Please enter an Employee ID",
-            problems:1 })
+            problems:1 },()=>{this.passwordcheck()})
         }else      
         if(this.state.EmployeeId!==""){
             console.log("check")
             HttpService.CheckId(checklist).then(res =>{
                 if(res.data==="ID already exist in the database"){
                     this.setState({employeeError:res.data,
-                        problems:1 })
+                        problems:1 },()=>{this.passwordcheck()})
+                }else{
+                    this.passwordcheck();
                 }
             })
         }
@@ -186,14 +201,18 @@ class CreateEmployee extends Component{
         if (this.state.password===""){
             window.scrollTo(0,0);
             this.setState({passwordError:"Please enter a valid password",
-            problems:1 })
+            problems:1 },()=>{this.experiencecheck();})
+        }else{
+            this.experiencecheck();
         }
     }
 
     experiencecheck(){
         if (isNaN(this.state.ExperienceYear)) {
             this.setState({experienceError:"Please enter a number",
-            problems:1 })
+            problems:1 },()=>{this.problemcheck();})
+        }else{
+            this.problemcheck();
         }
     }
 
@@ -210,19 +229,20 @@ class CreateEmployee extends Component{
         }
         e.preventDefault();
         this.setState({usernameError:"",
+        employeeError:"",
         nameError:"",
         passwordError:"",
         emailError:"",
         experienceError:"",
-        problems:0})
+        problems:0},()=>{this.emailchecker(checklist);})
 
-        this.emailchecker(checklist);
-        this.usernamechecker(checklist);
-        this.namechecker();
-        this.employeeidchecker(checklist);
-        this.passwordcheck();
-        this.experiencecheck();
-        this.problemcheck();
+        
+        //this.usernamechecker(checklist);
+        //this.namechecker();
+        ///this.employeeidchecker(checklist);
+       // this.passwordcheck();
+        //this.experiencecheck();
+        //this.problemcheck();
     }
 
     emailValidation(email){
@@ -231,7 +251,6 @@ class CreateEmployee extends Component{
         };
 
     saveEmployee = () =>{
-        console.log(this.state.name);
         let employee = {
             name:this.state.name, 
             userName:this.state.username,
@@ -248,6 +267,7 @@ class CreateEmployee extends Component{
             dateJoined:this.state.DateJoined,
             photo:this.state.photo,
             attachment:this.state.attachment,
+            createdBy:JSON.parse(localStorage.getItem('user')).username,
             active:1};
         let details = {
             username:this.state.username,
@@ -265,6 +285,57 @@ class CreateEmployee extends Component{
         e.preventDefault();
         this.props.history.push('/admin');
     }
+
+    getAttachment() {
+        const filePreviewOption = {
+          followCursor: false,
+          shiftX: 20,
+          shiftY: 0,
+        };
+     
+        if (this.state.id === "add") {
+          return;
+        } else {
+          if (!this.state.attachment) {
+            return;
+          } else {
+            const downloadLink = [];
+            for (const [index, value] of this.state.attachment
+              .split(",")
+              .entries()) {
+              const initial = value
+                .split(RegExp("%2..*%2F(.*?)alt"))[1]
+                .split(".")[0];
+              const fileName = initial.replaceAll("%20", " ");
+              downloadLink.push(
+                <li style={{ marginBottom: "5px" }} key={index}>
+                    <a href={value}>{fileName}</a>
+                    <button onClick={this.deleteAttachment} 
+                    name={index}>remove</button>
+                </li>
+                // <ReactHover options={filePreviewOption}>
+                //   <Trigger type="trigger">
+                //     <li style={{ marginBottom: "5px" }} key={index}>
+                //       <a href={value}>{fileName}</a>
+                //     </li>
+                //   </Trigger>
+                //   <Hover type="hover">
+                //     <div>
+                //       <iframe
+                //         src={value}
+                //         title="File Preview"
+                //         style={{ width: "500px", height: "300px" }}
+                //       />
+                //       {/* <embed src={value} height="" width=""></embed> */}
+                //     </div>
+                //   </Hover>
+                // </ReactHover>
+              );
+            }
+            return downloadLink;
+          }
+        }
+      }
     render(){
         const uploadImage = (e) => {
             const image = e.target.files[0];
@@ -444,26 +515,35 @@ class CreateEmployee extends Component{
                                     <div className="form-group">
                                         <label>Date of Birth: </label>
                                         <TextField id="datefield"  type="date" value={this.state.DOB} onChange={this.changeDOBHandler} InputLabelProps={{shrink: true,}}/>
-                                        {/* <input placeholder="DD/MM/YYYY"  type="date" id="datefield" className="datepicker" data-date-format="mm/dd/yyyy" startDate= '-3d'
-                                        ></input> */}
                                     </div>
 
 
                                     <div className="form-group">
                                         <label>Date Joined: </label>
                                         <TextField id="datefield"  type="date" value={this.state.DateJoined} onChange={this.changeDateJoinedHandler} InputLabelProps={{shrink: true,}}/>
-                                        {/* <input placeholder="DD/MM/YYYY"  type="date" data-date-format="mm/dd/yyyy"
-                                        value={this.state.DateJoined} onChange={this.changeDateJoinedHandler} ></input> */}
                                     </div>
 
                                     <div>
+                                    <hr/>
                                     <label>Attachment</label>
                                     <br/>
                                     <input type="file" multiple onChange={uploadAttachment} ></input>
-                                    <hr/>
-                                    <ul>
-                                    <a href={this.state.attachment} rel="case"> {this.state.attachmentName}</a>
-                                    </ul>
+                                    <br/>
+                                    <br/>
+                                    <div>
+                                    <Accordion defaultActiveKey="1" >
+                                        <Card >
+                                            <Accordion.Toggle as={Card.Header} collapse eventKey="0" className="List_A text-white bg-dark" >
+                                            List of Attachment
+                                            <i class ="	fa fa-file-text float-left" style={{paddingRight:"10px"}}></i>
+                                            <i class="fa fa-chevron-down float-right" ></i>
+                                            </Accordion.Toggle>
+                                            <Accordion.Collapse eventKey="0">
+                                            <Card.Body>{this.getAttachment()}</Card.Body>
+                                            </Accordion.Collapse>
+                                        </Card>
+                                    </Accordion>
+                                </div>
                                 </div>
 
                                     <button className="btn float-left" onClick={this.goBack}>Cancel</button>

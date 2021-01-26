@@ -18,22 +18,20 @@ export class ForgotPassword extends Component {
     }
 
     checker=(e)=>{
-
+ 
         e.preventDefault();
         this.setState({
         emailError:"",
-        problems:0})
-
+        },()=>{ 
+            
         if(this.emailValidation(this.state.Email)===false){
             window.scrollTo(0,0);
-            this.setState({emailError:"Please enter a valid email address",
-                           problems:1 })
-        }
-
-        console.log(this.state.problems)
-        if(this.state.problems===0){
-             this.sendEmail();
-        }
+            this.setState({emailError:"Please enter a valid email address"})
+        }else
+        if(this.emailValidation(this.state.Email)===true){
+                    this.sendEmail();
+            }
+        })
     }
     emailValidation(email){
         const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -72,7 +70,7 @@ export class ForgotPassword extends Component {
                 <form>
                     <div className="form-group">
                         <label>Email:</label>
-                        <input type="text" name="email" id="email"placeholder="Enter you e-mail" className="form-control"
+                        <input type="text" name="email" id="email"placeholder="Enter your e-mail" className="form-control"
                         value={this.state.Email}onChange={this.changeEmailHandler}required autofocus></input>
                         <small id="emaildHelp" class="text-danger">{this.state.emailError} </small>
                     </div>

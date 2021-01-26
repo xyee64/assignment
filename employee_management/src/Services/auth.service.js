@@ -36,6 +36,12 @@ class AuthService {
     return axios.post("http://localhost:8080/forgot_password", formData)
   }
 
+  checkPass(username,oldPassword){
+    let formData = new FormData()
+    formData.append("username",username)
+    formData.append("oldPassword",oldPassword)
+    return axios.post("http://localhost:8080/change_password/check", formData)
+  }
   changePass(username,password){
     let formData = new FormData()
     formData.append("username",username)
@@ -48,6 +54,10 @@ class AuthService {
     formData.append("password", password);
     return axios.post("http://localhost:8080/reset_password", formData);
   }
+
+  getUserById(id){
+    return axios.post("http://localhost:8080/user/"+id, { headers: authHeader() });
+}
 }
 
 export default new AuthService();

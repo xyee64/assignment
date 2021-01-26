@@ -23,8 +23,8 @@ public class Employee {
 	private String Address;
 	private int softDelete;
 	private int active;
-//	@Lob
-//	private Blob content;
+	private String createdBy;
+	private String edittedBy;
 	private String name;
 	private String DOB;
 	private String Position;
@@ -35,7 +35,6 @@ public class Employee {
 	private String userName;
 	private String photo;
 	private String attachment;
-	private String attachmentName;
 	
 //	@ManyToOne
 //	@JoinColumn(name="user_id")
@@ -149,17 +148,16 @@ public class Employee {
 	public void setAttachment(String attachment) {
 		this.attachment = attachment;
 	}
-	public String getAttachmentName() {
-		return attachmentName;
+	public String getCreatedBy() {
+		return createdBy;
 	}
-	public void setAttachmentName(String attachmentName) {
-		this.attachmentName = attachmentName;
+	public void setCreatedBy(String createdBy) {
+		this.createdBy = createdBy;
 	}
-	
-	
-
-	
-	
-	
-
+	public String getEdittedBy() {
+		return edittedBy;
+	}
+	public void setEdittedBy(String edittedBy) {
+		this.edittedBy = edittedBy;
+	}
 }

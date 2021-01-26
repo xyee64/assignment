@@ -9,14 +9,17 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import com.secure.Security1.model.User;
+import com.secure.Security1.response.MessageResponse;
 
 import net.bytebuddy.utility.RandomString;
 
@@ -30,6 +33,8 @@ public class ForgotPasswordController {
 	@Autowired
 	private JavaMailSender mailSender;
 
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 	
 	@PostMapping("/forgot_password")
 	public String processForgotPasswordForm(HttpServletRequest request,Model model) {
@@ -116,24 +121,36 @@ public class ForgotPasswordController {
 		
 		return"message";
 	}
-	
+
+	@PostMapping("/change_password/check")
+	public ResponseEntity <?>checkPassword(HttpServletRequest request){
+		String username = request.getParameter("username");
+        String oldPassword = request.getParameter("oldPassword");
+		User user = userService.getByUsername(username);
+		if(user == null) {
+			return ResponseEntity.badRequest().body(new MessageResponse("Incorrect User."));
+		}else
+		if(!passwordEncoder.matches(oldPassword,user.getPassword())) {
+			return ResponseEntity.badRequest().body(new MessageResponse("Incorrect old password."));
+		}else {
+			return ResponseEntity.ok(new MessageResponse("correct"));
+		}
+
+	}
 	@PostMapping("/change_password")
 	@PreAuthorize("hasAuthority('ADMIN')or hasAuthority('USER')")
-	public String changePassword(HttpServletRequest request, Model model) {
-		String password = request.getParameter("password");
+    public ResponseEntity <?> changePassword(HttpServletRequest request, Model model) {
 		String username = request.getParameter("username");
-		
-		User user = userService.getByUsername(username);
-		
-		if(user == null) {
-			model.addAttribute("message","Wrong");
-			return "message";
-		}	
-		else {
-			userService.changePassword(user, password);
-			model.addAttribute("message","You have successfully changed your password.");
-		}
-		
-		return"message";
-	}
+        String password = request.getParameter("password");
+
+        User user = userService.getByUsername(username);
+
+        if (user == null) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Incorrect user."));
+        }
+        else {
+            userService.changePassword(user, password);
+        }
+        return ResponseEntity.ok(new MessageResponse("You have successfully changed your password."));
+    }
 }

@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
 import HttpService from '../Services/HttpService';
+import Accordion from 'react-bootstrap/Accordion';
+import Button from 'react-bootstrap/Button';
+import Card from 'react-bootstrap/Card';
 
 export class EmployeeDetails extends Component {
     constructor(props){
@@ -21,12 +24,21 @@ export class EmployeeDetails extends Component {
             username:"",
             photo:"",
             attachment:"",
-            attachmentName:""
+            attachmentName:"",
+            edittedBy:"",
+            createdBy:""
         }
     }
 
     componentDidMount(){
-        console.log(this.state.id)
+        if(JSON.parse(localStorage.getItem('user'))===null){
+            this.props.history.push(`/`);
+        }
+        if(JSON.parse(localStorage.getItem('user'))!==null){
+            if(JSON.parse(localStorage.getItem('user')).roles[0]!=="ADMIN"){
+                this.props.history.push(`/profile`);
+            }
+        }
         HttpService.getEmployeeById(this.state.id).then((res)=>{
             let employee=res.data;
             this.setState({
@@ -45,6 +57,8 @@ export class EmployeeDetails extends Component {
                 username:employee.userName,
                 photo:employee.photo,
                 attachment:employee.attachment,
+                createdBy:employee.createdBy,
+                edittedBy:employee.edittedBy,
                 attachmentName:employee.attachmentName
             })
         }
@@ -55,6 +69,55 @@ export class EmployeeDetails extends Component {
         e.preventDefault();
         this.props.history.goBack();
     }
+
+    getAttachment() {
+        const filePreviewOption = {
+          followCursor: false,
+          shiftX: 20,
+          shiftY: 0,
+        };
+     
+        if (this.state.id === "add") {
+          return;
+        } else {
+          if (!this.state.attachment) {
+            return;
+          } else {
+            const downloadLink = [];
+            for (const [index, value] of this.state.attachment
+              .split(",")
+              .entries()) {
+              const initial = value
+                .split(RegExp("%2..*%2F(.*?)alt"))[1]
+                .split(".")[0];
+              const fileName = initial.replaceAll("%20", " ");
+              downloadLink.push(
+                <li style={{ marginBottom: "5px" }} key={index}>
+                    <a href={value}>{fileName}</a>
+                </li>
+                // <ReactHover options={filePreviewOption}>
+                //   <Trigger type="trigger">
+                //     <li style={{ marginBottom: "5px" }} key={index}>
+                //       <a href={value}>{fileName}</a>
+                //     </li>
+                //   </Trigger>
+                //   <Hover type="hover">
+                //     <div>
+                //       <iframe
+                //         src={value}
+                //         title="File Preview"
+                //         style={{ width: "500px", height: "300px" }}
+                //       />
+                //       {/* <embed src={value} height="" width=""></embed> */}
+                //     </div>
+                //   </Hover>
+                // </ReactHover>
+              );
+            }
+            return downloadLink;
+          }
+        }
+      }
 
 
     render(){
@@ -137,15 +200,28 @@ export class EmployeeDetails extends Component {
                                     <input placeholder="DD/MM/YYYY" name="phone" className="form-control"
                                     value={this.state.DateJoined} onChange={this.changeDateJoinedHandler} readOnly></input>
                                 </div>
+                                <div className="form-group">
+                                    <label>Created By: {this.state.createdBy}</label>
+                                </div>
+                                <div className="form-group">
+                                    <label>Editted By: {this.state.edittedBy}</label>
+                                </div>
 
                                 <div>
-                                    <br/>
-                                    <label>Attachment:</label>
-                                    <hr/>
-                                    <ul>
-                                    <a href={this.state.attachment} rel="case"> {this.state.attachmentName}</a>
-                                    </ul>
+                                <Accordion defaultActiveKey="1" >
+                                    <Card >
+                                        <Accordion.Toggle as={Card.Header} collapse eventKey="0" className="List_A text-white bg-dark" >
+                                        List of Attachment
+                                        <i class ="	fa fa-file-text float-left" style={{paddingRight:"10px"}}></i>
+                                        <i class="fa fa-chevron-down float-right" ></i>
+                                        </Accordion.Toggle>
+                                        <Accordion.Collapse eventKey="0">
+                                        <Card.Body>{this.getAttachment()}</Card.Body>
+                                        </Accordion.Collapse>
+                                    </Card>
+                                </Accordion>
                                 </div>
+                                <br/>
                                 <button className="btn btn-primary float-right" onClick={this.goBack}>Back</button>
                             </form>
                         </div>

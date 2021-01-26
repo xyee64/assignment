@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.secure.Security1.Employee.Employee;
+import com.secure.Security1.Employee.EmployeeRepository;
 import com.secure.Security1.model.User;
 import com.secure.Security1.respositories.UserRepository;
 
@@ -57,5 +59,13 @@ public class UserService {
 		user.setPassword(encodedPassword);
 		
 		userRepository.save(user);
+	}
+	
+
+	public Iterable<User> findAll(){
+		return userRepository.findAll();
+	}
+	public User find(Integer id) {
+		return userRepository.findById(id).get();
 	}
 }

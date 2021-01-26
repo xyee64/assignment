@@ -22,6 +22,14 @@ export class EmployeeList extends Component {
     }
 
 componentDidMount(){
+    if(JSON.parse(localStorage.getItem('user'))===null){
+        this.props.history.push(`/`);
+    }
+    if(JSON.parse(localStorage.getItem('user'))!==null){
+        if(JSON.parse(localStorage.getItem('user')).roles[0]!=="ADMIN"){
+            this.props.history.push(`/profile`);
+        }
+    }
     HttpService.getActiveUser().then((res)=>{
         this.setState({employees:res.data});
     });

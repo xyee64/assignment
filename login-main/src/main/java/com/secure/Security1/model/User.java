@@ -32,21 +32,21 @@ public class User {
 				inverseJoinColumns = @JoinColumn(name="role_id"))
 	private Set<Role> roles = new HashSet<>();
 	
-	@OneToMany(targetEntity=Employee.class, cascade=CascadeType.ALL)
-	@JoinColumn(name="ue_fk", referencedColumnName="user_id")
-	private List<Employee> employee;
-		
-	public List<Employee> getEmployee() {
-		return employee;
-	}
-
-	public void setEmployee(List<Employee> employee) {
-		this.employee = employee;
-	}
-
-	public User(List<Employee> employee) {
-		this.employee = employee;
-	}
+//	@OneToMany(targetEntity=Employee.class, cascade=CascadeType.ALL)
+//	@JoinColumn(name="ue_fk", referencedColumnName="user_id")
+//	private List<Employee> employee;
+//		
+//	public List<Employee> getEmployee() {
+//		return employee;
+//	}
+//
+//	public void setEmployee(List<Employee> employee) {
+//		this.employee = employee;
+//	}
+//
+//	public User(List<Employee> employee) {
+//		this.employee = employee;
+//	}
 
 	public User() {
 	}

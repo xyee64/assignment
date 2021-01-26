@@ -2,6 +2,10 @@ import React, { Component } from 'react';
 import HttpService from '../Services/HttpService';
 import TextField from '@material-ui/core/TextField';
 import {storage} from '../firebase';
+import ReactHover from 'react-hover';
+import { Trigger, Hover } from 'react-hover/dist/ReactHover';
+import Accordion from 'react-bootstrap/Accordion';
+import Card from 'react-bootstrap/Card';
 
 class EditEmployee extends Component{
     constructor(props){
@@ -25,7 +29,14 @@ class EditEmployee extends Component{
             softDelete:"",
             photo:"",
             attachment:"",
-            attachmentName:""
+            attachmentName:"",
+            nameError:"",
+            experienceError:"",
+            employeeError:"",
+            problems:"",
+            edittedBy:"",
+            createdBy:"",
+            fileList:[]
         }
         this.changeNameHandler = this.changeNameHandler.bind(this);
         this.changeEmployeeIdHandler = this.changeEmployeeIdHandler.bind(this);
@@ -43,6 +54,7 @@ class EditEmployee extends Component{
         this.changePhotoHandler = this.changePhotoHandler.bind(this);
         this.changeAttachmentHandler = this.changeAttachmentHandler.bind(this);
         this.changeAttachmentNameHandler = this.changeAttachmentNameHandler.bind(this);
+        // this.checker= this.checker.bind(this);
         this.saveEmployee = this.saveEmployee.bind(this);
     }
 
@@ -69,6 +81,8 @@ class EditEmployee extends Component{
                 photo:employee.photo,
                 attachment:employee.attachment,
                 attachmentName:employee.attachmentName,
+                createdBy:employee.cretedBy,
+                edittedBy:employee.edittedBy
             })
         }
         )
@@ -144,6 +158,61 @@ class EditEmployee extends Component{
         this.props.history.push('/admin');
     }
 
+    // namechecker(){
+    //     if(this.state.name===""){
+    //         window.scrollTo(0,0);
+    //         this.setState({nameError:"Please enter a name",
+    //         problems:1 })
+    //     }
+    // }
+
+    // employeeidchecker(checklist){
+    //     if(this.state.EmployeeId===""){
+    //         window.scrollTo(0,0);
+    //         this.setState({employeeError:"Please enter an Employee ID",
+    //         problems:1 })
+    //     }else      
+    //     if(this.state.EmployeeId!==""){
+    //         console.log("check")
+    //         HttpService.CheckId(checklist).then(res =>{
+    //             if(res.data==="ID already exist in the database"){
+    //                 this.setState({employeeError:res.data,
+    //                     problems:1 })
+    //             }
+    //         })
+     
+    //     }
+    // }
+
+    // experiencecheck(){
+    //     if (isNaN(this.state.ExperienceYear)) {
+    //         this.setState({experienceError:"Please enter a number",
+    //         problems:1 })
+    //     }
+    // }
+
+    // problemcheck(){
+    //     if(this.state.problems===0){
+    //         this.saveEmployee();
+    //    }
+    // }
+    
+    // checker=(e)=>{
+    //     e.preventDefault();
+    //     this.setState({
+    //     nameError:"",
+    //     experienceError:"",
+    //     problems:0})
+
+    //     let checklist={
+    //         employeeId:this.state.EmployeeId
+    //     }
+    //     // this.employeeidchecker(checklist);
+    //     this.experiencecheck();
+    //     this.namechecker();
+    //     this.problemcheck();
+    // }
+
     saveEmployee = (e) =>{
         e.preventDefault();
         let employee = {
@@ -163,23 +232,77 @@ class EditEmployee extends Component{
             userName:this.state.userName,
             active:this.state.active,
             softDelete:this.state.softDelete,
+            nameError:"",
+            emailError:"",
+            experienceError:"",
+            employeeError:"",
             photo:this.state.photo,
             attachment:this.state.attachment,
-            attachmentName:this.state.attachmentName};
+            attachmentName:this.state.attachmentName,
+            createdBy:this.state.createdBy,
+            edittedBy:JSON.parse(localStorage.getItem('user')).username};
 
         HttpService.createEmployee(employee).then(res =>{
             this.props.history.push('/admin');
         })
     }
-
+    
+    getAttachment() {
+        const filePreviewOption = {
+          followCursor: false,
+          shiftX: 20,
+          shiftY: 0,
+        };
+     
+        if (this.state.id === "add") {
+          return;
+        } else {
+          if (!this.state.attachment) {
+            return;
+          } else {
+            const downloadLink = [];
+            for (const [index, value] of this.state.attachment
+              .split(",")
+              .entries()) {
+              const initial = value
+                .split(RegExp("%2..*%2F(.*?)alt"))[1]
+                .split(".")[0];
+              const fileName = initial.replaceAll("%20", " ");
+              downloadLink.push(
+                <li style={{ marginBottom: "5px" }} key={index}>
+                    <a href={value}>{fileName}</a>
+                </li>
+                // <ReactHover options={filePreviewOption}>
+                //   <Trigger type="trigger">
+                //     <li style={{ marginBottom: "5px" }} key={index}>
+                //       <a href={value}>{fileName}</a>
+                //     </li>
+                //   </Trigger>
+                //   <Hover type="hover">
+                //     <div>
+                //       <iframe
+                //         src={value}
+                //         title="File Preview"
+                //         style={{ width: "500px", height: "300px" }}
+                //       />
+                //       {/* <embed src={value} height="" width=""></embed> */}
+                //     </div>
+                //   </Hover>
+                // </ReactHover>
+              );
+            }
+            return downloadLink;
+          }
+        }
+      }
+    
     
 
     render(){
         const uploadImage = (e) => {
             const image = e.target.files[0];
             const uploadTask = storage.ref(`images/${image.name}`).put(image);
-            uploadTask.on(
-              "state_changed",
+            uploadTask.on("state_changed",
               (snapshot) => {
                 // progress function ....
                 const progress = Math.round(
@@ -205,38 +328,58 @@ class EditEmployee extends Component{
             );
           };
 
-          const uploadAttachment = (e) => {
-            const attachment = e.target.files[0];
-            const attachmentName = e.target.files[0].name;
-            const uploadTask = storage.ref(`attachment/${attachmentName}`).put(attachment);
-            uploadTask.on(
-              "state_changed",
-              (snapshot) => {
-                // progress function ....
-                const progress = Math.round(
-                  (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-                );
-                this.setState({ progress });
-              },
-              (error) => {
-                // error function ....
-                console.log(error);
-              },
-              () => {
-                // complete function ....
-                this.setState({attachmentName:attachmentName})
-                storage
-                  .ref("attachment")
-                  .child(attachmentName)
-                  .getDownloadURL()
-                  .then((url) => {
-                    console.log(attachmentName)
-                    console.log(url);
-                    this.setState({ attachment: url });
-                  });
+          const uploadAttachment =(e) =>{
+              if(this.state.id ===''){
+                alert("Please insert a employee ID");
+                return
               }
-            );
-          };
+              else{
+                  console.log('file length: ', e.target.files.length)
+                  for(let i = 0; i<e.target.files.length;i++){
+                      const attachment = e.target.files[i];
+                      try{
+                          if(attachment.size >5242880){
+                              alert("The file size is too big. Choose another file.")
+                          }
+                          else{
+                              const storageRef = storage.ref('attachment/'+this.state.userName)
+                              const fileRef = storageRef.child(attachment.name)
+                              fileRef.put(attachment).then(()=>{
+                                  console.log("Upload successfully "+attachment.name)
+                              })
+                          }
+                      }
+                      catch{
+                          return
+                      }
+                  }
+                  try{
+                      setTimeout(() =>{
+                          const storageRef = storage.ref('attachment/'+this.state.userName)
+                          storageRef.listAll().then(res =>{
+                              res.items.forEach(itemRef =>{
+                                  itemRef.getDownloadURL().then((url)=>{
+                                      var attachmentList = this.state.fileList.concat(url)
+                                      this.setState({fileList : attachmentList})
+                                      this.setState({attachment:this.state.fileList.join(",")})
+                                      console.log(this.state.fileList)
+                                      console.log(this.state.attachment)
+                                  }).catch(function (error){
+                                      console.log(error)
+                                  });
+                              });
+                          }).catch(function (error){
+                              console.log(error)
+                          });
+                      },1000)
+                  }
+                  catch{
+                      return
+                  }
+              }
+          }
+
+           
         return(
             <div>
             <div className="container">
@@ -246,28 +389,28 @@ class EditEmployee extends Component{
                         <div className="card-body">
                             <form>
                                 <div className="img-holder">
-                                        <img src={this.state.photo || 'http://ky.myacpa.org/wp-content/uploads/2019/10/blank-profile-picture-coming-soon.png'}
-                                        alt="Profile_Picture" className="img"/>
-                                    </div>
-                                        {/* <progress value={this.state.progress} max="100" /> */}
-                                        {/* <br /> */}
-                                        <input type="file" name="photo-upload"id="photo-upload" onChange={uploadImage} />
-                                    <div className="upload-icon">
-                                        <label htmlFor="photo-upload" className="photo-upload">
-                                                <i className="material-icons">add_photo_alternate</i>
-                                                Choose Your Photo
-                                        </label>
+                                    <img src={this.state.photo || 'http://ky.myacpa.org/wp-content/uploads/2019/10/blank-profile-picture-coming-soon.png'}
+                                    alt="Profile_Picture" className="img"/>
+                                </div>
+                                    <input type="file" name="photo-upload"id="photo-upload" onChange={uploadImage} />
+                                <div className="upload-icon">
+                                    <label htmlFor="photo-upload" className="photo-upload">
+                                            <i className="material-icons">add_photo_alternate</i>
+                                            Choose Your Photo
+                                    </label>
                                 </div>
 
                                 <div className="form-group">
                                     <label>Name:</label>
                                     <input placeholder="Name" name="name" className="form-control"
                                     value={this.state.name} onChange={this.changeNameHandler}></input>
+                                    <small id="passwordHelp" class="text-danger">{this.state.nameError} </small> 
                                 </div>
                                 <div className="form-group">
                                     <label>Employee Id:</label>
                                     <input placeholder="Employee Id" name="name" className="form-control"
                                     value={this.state.EmployeeId} onChange={this.changeEmployeeIdHandler}></input>
+                                     <small id="passwordHelp" class="text-danger">{this.state.employeeError} </small>
                                 </div>
                                 <div className="form-group">
                                     <label>Department:</label>
@@ -298,6 +441,7 @@ class EditEmployee extends Component{
                                     <label>Experience Years:</label>
                                     <input placeholder="Experience Year" name="phone" className="form-control"
                                     value={this.state.ExperienceYear} onChange={this.changeExperienceYearHandler}></input>
+                                    <small id="passwordHelp" class="text-danger">{this.state.experienceError} </small>
                                 </div>
                                 <div className="form-group">
                                     <label>Office Location:</label>
@@ -309,26 +453,43 @@ class EditEmployee extends Component{
                                     <textarea rows="3" placeholder="Address" name="phone" className="form-control"
                                     value={this.state.Address} onChange={this.changeAddressHandler}></textarea>
                                 </div>
-                                <div className="form-group">
-                                    <label>Date of Birth: </label>
-                                    <TextField id="datefield"  type="date" value={this.state.DOB} onChange={this.changeDOBHandler} InputLabelProps={{shrink: true,}}/>
+                                <div className="row">
+                                    <div className="form-group col-md-6 ">
+                                        {/* <label>Date of Birth: </label> */}
+                                        <TextField id="datefield" label="Date of Birth"   variant="outlined" type="date" value={this.state.DOB} onChange={this.changeDOBHandler} InputLabelProps={{shrink: true,}}/>
+                                    </div>
+
+
+                                    <div className="form-group col-md-6 ">
+                                        {/* <label>Date Joined: </label> */}
+                                        <TextField id="datefield"  label="Date Joined" variant="outlined" type="date" value={this.state.DateJoined} onChange={this.changeDateJoinedHandler} InputLabelProps={{shrink: true,}}/>
+                                    </div>
                                 </div>
-
-
-                                <div className="form-group">
-                                    <label>Date Joined: </label>
-                                    <TextField id="datefield"  type="date" value={this.state.DateJoined} onChange={this.changeDateJoinedHandler} InputLabelProps={{shrink: true,}}/>
-                                </div>
-
+                                
                                 <div>
+                                    <hr/>
                                     <label>Attachment</label>
                                     <br/>
                                     <input type="file" multiple onChange={uploadAttachment} ></input>
-                                    <hr/>
-                                    <ul>
-                                    <a href={this.state.attachment} rel="case"> {this.state.attachmentName}</a>
-                                    </ul>
+                                    <br/>
+                                    <br/>
+                                    <div>
+                                    <Accordion defaultActiveKey="1" >
+                                        <Card >
+                                            <Accordion.Toggle as={Card.Header} collapse eventKey="0" className="List_A text-white bg-dark" >
+                                            List of Attachment
+                                            <i class ="	fa fa-file-text float-left" style={{paddingRight:"10px"}}></i>
+                                            <i class="fa fa-chevron-down float-right" ></i>
+                                            </Accordion.Toggle>
+                                            <Accordion.Collapse eventKey="0">
+                                            <Card.Body>{this.getAttachment()}</Card.Body>
+                                            </Accordion.Collapse>
+                                        </Card>
+                                    </Accordion>
                                 </div>
+                                </div>
+                                <br/>
+                                
 
                                 <button className="btn float-left" onClick={this.goBack}>Cancel</button>
                                 <button className="btn float-right btn-info" onClick={this.saveEmployee}>Save</button>

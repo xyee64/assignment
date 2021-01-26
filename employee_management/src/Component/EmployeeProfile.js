@@ -51,6 +51,8 @@ export class EmployeeProfile extends Component {
                 DateJoined:employee.dateJoined,
                 active:employee.active,
                 softDelete:employee.softDelete,
+                createdBy:employee.createdBy,
+                edittedBy:employee.edittedBy,
                 photo: employee.photo
             })
         }
@@ -94,6 +96,8 @@ export class EmployeeProfile extends Component {
             userName:this.state.username,
             active:this.state.active,
             softDelete:this.state.softDelete,
+            createdBy:this.state.createdBy,
+            edittedBy:JSON.parse(localStorage.getItem('user')).username,
             photo:this.state.photo};
         HttpService.createEmployee(employee).then(res =>{
             this.props.history.push('/profile');

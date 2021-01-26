@@ -14,8 +14,9 @@
   box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
 }
 .login-con{
-  max-width: 350px;
-  padding: 50px 25px 30px;
+  max-width: 300px;
+  max-height: fit-content;
+  padding: 50px 25px 10px;
   margin: auto;
   margin-top: 50px;
   /* margin-right: 40px;  */
@@ -88,6 +89,7 @@
 body, html {
   margin: 0;
   height: 100%;
+  font-size: small;
 }
 #root{
   height: 100%;
@@ -158,4 +160,4 @@ body, html {
 }
 .dropdown{
   height: 40px;
-}
+} 
